@@ -54,6 +54,8 @@ public static class BitWardenHelper
             }
         }
 
+        string? destinationName = spec.Name ?? entity.Name();
+        string? destinationNamespace = spec.Namespace ?? entity.Namespace();
         return new V1Secret
         {
             Kind = "Secret",
@@ -61,7 +63,8 @@ public static class BitWardenHelper
             ApiVersion = "v1",
             Metadata = new V1ObjectMeta()
             {
-                Name = spec.Name,
+                Name = destinationName,
+                NamespaceProperty = destinationNamespace,
                 Labels = spec.Labels
             },
             Data = secrets,

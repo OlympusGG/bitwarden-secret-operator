@@ -6,13 +6,17 @@ metadata:
 spec:
   name: "my-secret-from-spec" # optional, will use the same name as CRD if not specified
   namespace: "my-namespace" # optional, will use the same namespace as CRD if not specified
-  content:
-    - element:
-        bitwardenId: d4ff5941-53a4-4622-9385-2fcf910ae7e7 # required
-        bitwardenSecretField: myBitwardenField # optional, mutually exclusive with `bitwardenSecretField` but acts as a second choice
-        bitwardenNote: false # optional, mutually exclusive and prioritized over `bitwardenSecretField`
-        kubernetesSecretKey: MY_KUBERNETES_SECRET_KEY # required
-    - element:
-        bitwardenId: d4ff5941-53a4-4622-9385-2fcf910ae7e7 # required
-        bitwardenNote: true # boolean, exclusive and prioritized over `bitwardenSecretField`
-        kubernetesSecretKey: MY_KUBERNETES_SECRET_KEY # required
+  labels: # optional set of labels
+    here-my-label-1: test
+  type: "kubernetes.io/tls" # optional, will use `Opaque` by default
+  bitwardenId: 00000000-0000-0000-0000-000000000000 # optional, this id applies to all elements without `bitwardenId` specified 
+  content: # required, array of objects
+  - bitwardenId: d4ff5941-53a4-4622-9385-2fcf910ae7e7 # optional, can be specified for a specific secret
+    bitwardenSecretField: myBitwardenField # optional, mutually exclusive with `bitwardenSecretField` but acts as a second choice
+    bitwardenNote: false # optional, mutually exclusive and prioritized over `bitwardenSecretField`
+    kubernetesSecretKey: MY_KUBERNETES_SECRET_KEY # required
+    kubernetesSecretValue: value # optional, alternative to stringData
+  - bitwardenNote: true # boolean, exclusive and prioritized over `bitwardenSecretField`
+    kubernetesSecretKey: MY_KUBERNETES_SECRET_KEY # required
+  stringData: # optional, string data
+    test: hello-world

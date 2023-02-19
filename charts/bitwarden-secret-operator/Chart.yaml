@@ -1,0 +1,27 @@
+apiVersion: v2
+name: bitwarden-secret-operator
+description: Deploy the Bitwarden Secret Operator
+
+type: application
+
+version: "0.5.3"
+
+appVersion: "0.5.3"
+
+keywords:
+  - operator
+  - bitwarden
+  - vaultwarden
+
+icon: https://olympusgg.github.io/bitwarden-secret-operator/logo.png
+
+home: https://olympusgg.github.io/bitwarden-secret-operator/
+
+sources:
+  - https://github.com/OlympusGG/bitwarden-crd-operator
+
+kubeVersion: '>= 1.23.0-0'
+
+maintainers:
+  - name: OlympusGG
+    email: contact@olympusgg.com

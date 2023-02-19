@@ -21,7 +21,7 @@ public static class BitWardenHelper
         }
 
         // bitwarden ID not specified
-        if (spec.Content.Any(s => s.BitwardenId == null))
+        if (spec.Content.Any(s => s.BitwardenId == null && s.KubernetesSecretValue == null))
         {
             IEnumerable<string> invalidSpecs = spec.Content.Where(s => s.BitwardenId == null).Select(s => s.KubernetesSecretKey);
             throw new InvalidDataException($"{entity.Name()} is invalid, no bitwarden id specified for kubernetesSecretKeys: {string.Join(',', invalidSpecs)}");

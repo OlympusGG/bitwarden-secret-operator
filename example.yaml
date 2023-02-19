@@ -1,0 +1,18 @@
+---
+apiVersion: bitwarden-secret-operator.io/v1beta1
+kind: BitwardenSecret
+metadata:
+  name: my-secret-from-bitwarden
+spec:
+  name: "my-secret-from-spec" # optional, will use the same name as CRD if not specified
+  namespace: "my-namespace" # optional, will use the same namespace as CRD if not specified
+  content:
+    - element:
+        bitwardenId: d4ff5941-53a4-4622-9385-2fcf910ae7e7 # required
+        bitwardenSecretField: myBitwardenField # optional, mutually exclusive with `bitwardenSecretField` but acts as a second choice
+        bitwardenNote: false # optional, mutually exclusive and prioritized over `bitwardenSecretField`
+        kubernetesSecretKey: MY_KUBERNETES_SECRET_KEY # required
+    - element:
+        bitwardenId: d4ff5941-53a4-4622-9385-2fcf910ae7e7 # required
+        bitwardenNote: true # boolean, exclusive and prioritized over `bitwardenSecretField`
+        kubernetesSecretKey: MY_KUBERNETES_SECRET_KEY # required

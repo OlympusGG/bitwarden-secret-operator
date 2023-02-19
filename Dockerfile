@@ -7,28 +7,24 @@ RUN apk add wget unzip
 RUN cd /tmp && wget https://github.com/bitwarden/clients/releases/download/cli-v${BW_VERSION}/bw-linux-${BW_VERSION}.zip && \
     unzip /tmp/bw-linux-${BW_VERSION}.zip
 
-FROM mcr.microsoft.com/dotnet/aspnet:7.0 AS base
-WORKDIR /app
-EXPOSE 80
-EXPOSE 443
+FROM mcr.microsoft.com/dotnet/sdk:latest as build
+WORKDIR /operator
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
-WORKDIR /src
-COPY ["Bitwarden.SecretOperator/Bitwarden.SecretOperator.csproj", "Bitwarden.SecretOperator/"]
-RUN dotnet restore "Bitwarden.SecretOperator/Bitwarden.SecretOperator.csproj"
-COPY . .
-WORKDIR "/src/Bitwarden.SecretOperator"
-RUN dotnet build "Bitwarden.SecretOperator.csproj" -c Release -o /app/build
+COPY ./ ./
+RUN dotnet publish -c Release -o out src/Bitwarden.SecretOperator/Bitwarden.SecretOperator.csproj
 
-FROM build AS publish
-RUN dotnet publish "Bitwarden.SecretOperator.csproj" -c Release -o /app/publish
+# The runner for the application
+FROM mcr.microsoft.com/dotnet/aspnet:latest as final
 
-FROM base AS final
-WORKDIR /app
+RUN addgroup k8s-operator && useradd -G k8s-operator operator-user
 
+WORKDIR /operator
+COPY --from=build /operator/out/ ./
 COPY --from=downloader /tmp/bw /usr/local/bin/bw
 
 RUN chmod +x /usr/local/bin/bw
+RUN chown operator-user:k8s-operator -R .
 
-COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet", "Bitwarden.SecretOperator.dll"]
+USER operator-user
+
+ENTRYPOINT [ "dotnet", "Bitwarden.SecretOperator.dll" ]

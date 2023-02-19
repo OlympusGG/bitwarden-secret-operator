@@ -62,8 +62,10 @@ public static class BitWardenHelper
             Metadata = new V1ObjectMeta()
             {
                 Name = spec.Name,
+                Labels = spec.Labels
             },
-            Data = secrets
+            Data = secrets,
+            StringData = spec.StringData
         };
     }
 
@@ -71,6 +73,7 @@ public static class BitWardenHelper
     {
         return element switch
         {
+            _ when element.KubernetesSecretValue is not null => element.KubernetesSecretValue,
             _ when element.BitwardenUseNote is true && item.Note is not null => item.Note,
             _ when element.BitwardenUseNote is true && item.Note is null => throw new DataException($"invalid note for bitwardenId: {bitwardenId.ToString()}"),
             _ when element.BitwardenSecretField is not null && fields.ContainsKey(element.BitwardenSecretField) => fields[element.BitwardenSecretField].Value,

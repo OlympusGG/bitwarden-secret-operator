@@ -13,7 +13,13 @@ public class BitwardenSecretSpec
     [Description("Name of the Bitwarden Secret, optional and can be overriden by fields in `content.bitwardenId`")]
     public string? BitwardenId { get; set; }
     
+    [Description("A set of labels to put to the secret resource")]
+    public Dictionary<string, string>? Labels { get; set; }
+
     [Description("Content of secret")]
     [Required]
     public List<ElementSpec> Content { get; set; }
+    
+    [Description("A set of string data to put to the secret")]
+    public Dictionary<string, string>? StringData { get; set; }
 }

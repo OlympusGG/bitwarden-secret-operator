@@ -17,4 +17,8 @@ public class ElementSpec
     [Description("Name of the Kubernetes Secret key")]
     [Required]
     public string KubernetesSecretKey { get; set; }
+    
+    
+    [Description("Name of the Kubernetes Secret Value")]
+    public string? KubernetesSecretValue { get; set; }
 }

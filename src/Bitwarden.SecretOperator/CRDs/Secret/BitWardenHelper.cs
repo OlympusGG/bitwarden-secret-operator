@@ -21,7 +21,7 @@ public static class BitWardenHelper
         }
 
         // bitwarden ID not specified
-        if (spec.Content.Any(s => s.BitwardenId == null))
+        if (spec.Content.Any(s => s.BitwardenId == null && s.KubernetesSecretValue == null))
         {
             IEnumerable<string> invalidSpecs = spec.Content.Where(s => s.BitwardenId == null).Select(s => s.KubernetesSecretKey);
             throw new InvalidDataException($"{entity.Name()} is invalid, no bitwarden id specified for kubernetesSecretKeys: {string.Join(',', invalidSpecs)}");
@@ -54,16 +54,21 @@ public static class BitWardenHelper
             }
         }
 
+        string? destinationName = spec.Name ?? entity.Name();
+        string? destinationNamespace = spec.Namespace ?? entity.Namespace();
         return new V1Secret
         {
             Kind = "Secret",
-            Type = "Opaque",
+            Type = spec.Type?? "Opaque",
             ApiVersion = "v1",
             Metadata = new V1ObjectMeta()
             {
-                Name = spec.Name,
+                Name = destinationName,
+                NamespaceProperty = destinationNamespace,
+                Labels = spec.Labels
             },
-            Data = secrets
+            Data = secrets,
+            StringData = spec.StringData
         };
     }
 
@@ -71,6 +76,7 @@ public static class BitWardenHelper
     {
         return element switch
         {
+            _ when element.KubernetesSecretValue is not null => element.KubernetesSecretValue,
             _ when element.BitwardenUseNote is true && item.Note is not null => item.Note,
             _ when element.BitwardenUseNote is true && item.Note is null => throw new DataException($"invalid note for bitwardenId: {bitwardenId.ToString()}"),
             _ when element.BitwardenSecretField is not null && fields.ContainsKey(element.BitwardenSecretField) => fields[element.BitwardenSecretField].Value,

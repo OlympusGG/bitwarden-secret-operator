@@ -12,15 +12,17 @@ namespace Bitwarden.SecretOperator.CRDs.Secret;
 [EntityRbac(typeof(V1Secret), Verbs = RbacVerb.All)]
 public class BitwardenSecretController : ControllerBase, IResourceController<BitwardenSecretCrd>
 {
+    private readonly BitwardenOperatorOptions _operatorOptions;
     private readonly ILogger<BitwardenSecretController> _logger;
     private readonly KubernetesClient _kubernetesClient;
     private readonly BitwardenCliWrapper _cliWrapper;
 
-    public BitwardenSecretController(ILogger<BitwardenSecretController> logger, KubernetesClient kubernetesClient, BitwardenCliWrapper cliWrapper)
+    public BitwardenSecretController(ILogger<BitwardenSecretController> logger, KubernetesClient kubernetesClient, BitwardenCliWrapper cliWrapper, BitwardenOperatorOptions operatorOptions)
     {
         _logger = logger;
         _kubernetesClient = kubernetesClient;
         _cliWrapper = cliWrapper;
+        _operatorOptions = operatorOptions;
     }
 
     public async Task<ResourceControllerResult?> ReconcileAsync(BitwardenSecretCrd entity)
@@ -52,7 +54,12 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
         {
             _logger.LogError(e, "[{Method}] Failed", nameof(ReconcileAsync));
             // requeue the event in 15 seconds
-            return ResourceControllerResult.RequeueEvent(TimeSpan.FromSeconds(15));
+            if (_operatorOptions.DelayAfterFailedWebhook is null)
+            {
+                throw;
+            }
+                
+            return ResourceControllerResult.RequeueEvent(_operatorOptions.DelayAfterFailedWebhook.Value);
         }
     }
 
@@ -63,6 +70,13 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
 
     public async Task DeletedAsync(BitwardenSecretCrd entity)
     {
-        await _kubernetesClient.Delete<V1Secret>(entity.Spec.Name, entity.Spec.Namespace);
+        try
+        {
+            await _kubernetesClient.Delete<V1Secret>(entity.Spec.Name, entity.Spec.Namespace);
+        }
+        catch (Exception e)
+        {
+            _logger.LogError(e, nameof(DeletedAsync));
+        }
     }
 }

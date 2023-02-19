@@ -10,12 +10,14 @@ WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 IServiceCollection services = builder.Services;
 
 services.AddLogging(s =>
+{
+    s.ClearProviders();
     s.AddSerilog(new LoggerConfiguration()
         .Enrich.FromLogContext()
         .WriteTo.Console(theme: AnsiConsoleTheme.Code, outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss.fff}][{Level:u4}][Thread:{ThreadId}] {Message:lj} {NewLine}{Exception}")
         .CreateLogger()
-    )
-);
+    );
+});
 services.AddKubernetesOperator()
 #if DEBUG
     .AddWebhookLocaltunnel()

@@ -4,21 +4,23 @@ description: Deploy the Bitwarden Secret Operator
 
 type: application
 
-version: "0.5.3"
+version: "0.6.0"
 
-appVersion: "0.5.3"
+appVersion: "0.6.0"
 
 keywords:
   - operator
   - bitwarden
   - vaultwarden
+  - secret-management
+  - gitops
 
 icon: https://olympusgg.github.io/bitwarden-secret-operator/logo.png
 
 home: https://olympusgg.github.io/bitwarden-secret-operator/
 
 sources:
-  - https://github.com/OlympusGG/bitwarden-crd-operator
+  - https://github.com/OlympusGG/bitwarden-secret-operator
 
 kubeVersion: '>= 1.23.0-0'
 

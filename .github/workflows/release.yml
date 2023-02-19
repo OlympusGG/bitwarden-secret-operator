@@ -37,12 +37,12 @@ jobs:
         uses: mikefarah/yq@v4.30.8
         id: app_version
         with:
-          cmd: yq '.appVersion' charts/bitwarden-crd-operator/Chart.yaml
+          cmd: yq '.appVersion' charts/bitwarden-secret-operator/Chart.yaml
 
       - name: Create SBOM
         uses: anchore/sbom-action@v0
         with:
-          image: OlympusGG/bitwarden-crd-operator:${{ steps.app_version.outputs.result }}
+          image: OlympusGG/bitwarden-secret-operator:${{ steps.app_version.outputs.result }}
         
       - name: Publish SBOM
         uses: anchore/sbom-action/publish-sbom@v0
@@ -63,6 +63,6 @@ jobs:
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file_glob: true
-          file: olympusgg-bitwarden-crd-operator_*.spdx.json
+          file: olympusgg-bitwarden-secret-operator_*.spdx.json
           tag:  ${{ steps.previoustag.outputs.tag }}
           overwrite: true

@@ -7,8 +7,11 @@ public class BitwardenSecretSpec
     [Description("Name of the Kubernetes Secret, defaults to the same name of the CRD")]
     public string? Name { get; set; }
 
-    [Description("Name of the Kubernetes Secret Namespace, defaults to the same namespace of the CRD")]
+    [Description("Namespace where the Kubernetes Secret will be placed, defaults to the same namespace of the CRD")]
     public string? Namespace { get; set; }
+    
+    [Description("Type of secret to create, defaults to Opaque if not specified")]
+    public string? Type { get; set; }
     
     [Description("Name of the Bitwarden Secret, optional and can be overriden by fields in `content.bitwardenId`")]
     public string? BitwardenId { get; set; }

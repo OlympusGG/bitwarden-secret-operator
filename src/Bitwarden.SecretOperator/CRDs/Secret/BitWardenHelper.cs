@@ -57,7 +57,7 @@ public static class BitWardenHelper
         return new V1Secret
         {
             Kind = "Secret",
-            Type = "Opaque",
+            Type = spec.Type?? "Opaque",
             ApiVersion = "v1",
             Metadata = new V1ObjectMeta()
             {

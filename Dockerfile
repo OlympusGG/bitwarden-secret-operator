@@ -27,4 +27,6 @@ RUN chown operator-user:k8s-operator -R .
 
 USER operator-user
 
+RUN mkdir -p /home/bw-operator/.config/Bitwarden\ CLI && touch /home/bw-operator/.config/Bitwarden\ CLI/data.json
+
 ENTRYPOINT [ "dotnet", "Bitwarden.SecretOperator.dll" ]

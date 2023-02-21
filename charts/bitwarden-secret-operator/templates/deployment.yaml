@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   labels:
     operator-deployment: bitwarden-secretoperator
-  name: operator
+  name: bitwarden-secretoperator
 spec:
   replicas: 1
   revisionHistoryLimit: 0
@@ -21,10 +21,10 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        envFrom:
-        - configMapRef:
-            name: webhook-config
-        image: operator
+        # envFrom:
+        # - configMapRef:
+        #     name: webhook-config
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
         livenessProbe:
           httpGet:
             path: /health

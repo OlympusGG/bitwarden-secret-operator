@@ -10,7 +10,7 @@ public class BitwardenCliWrapper : BackgroundService
     private readonly BitwardenOperatorOptions _operatorOptions;
     private readonly BitwardenCredentials _credentials;
     private readonly ILogger<BitwardenCliWrapper> _logger;
-    
+
     private string _sessionId;
     private bool _isLoggedIn;
     private DateTime? _lastSync;
@@ -22,7 +22,38 @@ public class BitwardenCliWrapper : BackgroundService
         _operatorOptions = operatorOptions.Value;
     }
 
+    public bool IsReady { get; set; }
+
     public async Task LoginAsync()
+    {
+        var stdOutBuffer = new StringBuilder();
+        var stdErrBuffer = new StringBuilder();
+
+        try
+        {
+            CommandResult loginResult = await Cli.Wrap("bw")
+                .WithArguments(args => args
+                    .Add("login")
+                    .Add("--apikey")
+                    .Add("--nointeraction")
+                )
+                .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOutBuffer))
+                .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
+                .WithEnvironmentVariables(new Dictionary<string, string?>
+                {
+                    { "BW_CLIENTID", _credentials.ClientId },
+                    { "BW_CLIENTSECRET", _credentials.ClientSecret }
+                })
+                .ExecuteAsync();
+        }
+        catch (Exception e)
+        {
+            string stdErr = stdErrBuffer.ToString();
+            _logger.LogError(e, "bw login: {error}", stdErr);
+        }
+    }
+
+    public async Task UnlockAsync()
     {
         var stdOutBuffer = new StringBuilder();
         var stdErrBuffer = new StringBuilder();
@@ -130,7 +161,7 @@ public class BitwardenCliWrapper : BackgroundService
                     await Task.Delay(_operatorOptions.RefreshRate, stoppingToken);
                     continue;
                 }
-                
+
                 DateTime now = DateTime.UtcNow;
                 TimeSpan timeBeforeNewRefresh = _lastSync.Value + _operatorOptions.RefreshRate - now;
                 if (timeBeforeNewRefresh.TotalMilliseconds > 0)
@@ -138,7 +169,7 @@ public class BitwardenCliWrapper : BackgroundService
                     await Task.Delay(timeBeforeNewRefresh, stoppingToken);
                     continue;
                 }
-                
+
                 await SynchronizeAsync();
                 // Synchronize may take some time
                 _lastSync = DateTime.UtcNow;
@@ -146,7 +177,7 @@ public class BitwardenCliWrapper : BackgroundService
             }
             catch (Exception e)
             {
-                _logger.LogError(e , "[{Scope}]", nameof(ExecuteAsync));
+                _logger.LogError(e, "[{Scope}]", nameof(ExecuteAsync));
             }
         }
     }

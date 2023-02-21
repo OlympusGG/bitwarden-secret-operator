@@ -18,11 +18,15 @@ services.AddLogging(s =>
         .CreateLogger()
     );
 });
-services.AddKubernetesOperator()
+var operatorBuilder = services.AddKubernetesOperator()
 #if DEBUG
     .AddWebhookLocaltunnel()
 #endif
     ;
+
+operatorBuilder.AddReadinessCheck<ReadyHealthcheck>();
+operatorBuilder.AddHealthCheck<LiveHealthcheck>();
+operatorBuilder.AddLivenessCheck<BasicHealthcheck>();
 
 services.AddSingleton<BitwardenCredentials>(new BitwardenCredentials
 {
@@ -39,6 +43,12 @@ WebApplication app = builder.Build();
 app.UseKubernetesOperator();
 
 var cliWrapper = app.Services.GetRequiredService<BitwardenCliWrapper>();
+app.Logger.LogInformation("Logging in...");
 await cliWrapper.LoginAsync();
+app.Logger.LogInformation("Unlocking...");
+await cliWrapper.UnlockAsync();
 
+cliWrapper.IsReady = true;
+
+app.Logger.LogInformation("Started...");
 await app.RunOperatorAsync(args);

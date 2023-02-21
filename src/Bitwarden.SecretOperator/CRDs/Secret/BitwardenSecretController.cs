@@ -5,6 +5,7 @@ using KubeOps.Operator.Controller;
 using KubeOps.Operator.Controller.Results;
 using KubeOps.Operator.Rbac;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 
 namespace Bitwarden.SecretOperator.CRDs.Secret;
 
@@ -17,12 +18,12 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
     private readonly KubernetesClient _kubernetesClient;
     private readonly BitwardenCliWrapper _cliWrapper;
 
-    public BitwardenSecretController(ILogger<BitwardenSecretController> logger, KubernetesClient kubernetesClient, BitwardenCliWrapper cliWrapper, BitwardenOperatorOptions operatorOptions)
+    public BitwardenSecretController(ILogger<BitwardenSecretController> logger, KubernetesClient kubernetesClient, BitwardenCliWrapper cliWrapper, IOptions<BitwardenOperatorOptions> operatorOptions)
     {
         _logger = logger;
         _kubernetesClient = kubernetesClient;
         _cliWrapper = cliWrapper;
-        _operatorOptions = operatorOptions;
+        _operatorOptions = operatorOptions.Value;
     }
 
     public async Task<ResourceControllerResult?> ReconcileAsync(BitwardenSecretCrd entity)

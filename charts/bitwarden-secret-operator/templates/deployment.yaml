@@ -55,9 +55,9 @@ spec:
               port: http
             initialDelaySeconds: 15
             timeoutSeconds: 1
-          terminationGracePeriodSeconds: 10
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      terminationGracePeriodSeconds: 10
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

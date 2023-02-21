@@ -89,9 +89,6 @@ spec:
     test: hello-world
 ```
 
-|---|---|
-|test|test|
-
 ## Credits/Thanks
 
 - [Bitwarden](https://bitwarden.com/) for their product

@@ -16,7 +16,7 @@ RUN dotnet publish -c Release -o out src/Bitwarden.SecretOperator/Bitwarden.Secr
 # The runner for the application
 FROM mcr.microsoft.com/dotnet/aspnet:latest as final
 
-RUN addgroup k8s-operator && useradd -G k8s-operator operator-user
+RUN addgroup k8s-operator && useradd --create-home -G k8s-operator operator-user
 
 WORKDIR /operator
 COPY --from=build /operator/out/ ./

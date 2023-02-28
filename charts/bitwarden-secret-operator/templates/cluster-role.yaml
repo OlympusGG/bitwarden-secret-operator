@@ -17,7 +17,7 @@ rules:
   verbs: [ "list", "get" ]
 - apiGroups: ["apps"]
   resources: ["deployments/status"]
-  verbs: ["get","patch","update"
+  verbs: ["get","patch","update"]
 - apiGroups: [ "" ]
   resources: [ "events" ]
   verbs: [ "create", "list", "watch", "get", "update" ]

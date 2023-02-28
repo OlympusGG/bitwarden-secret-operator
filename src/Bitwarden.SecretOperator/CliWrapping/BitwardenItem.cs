@@ -7,9 +7,9 @@ public class BitwardenItem
     [JsonPropertyName("id")]
     public Guid Id { get; set; }
 
-    [JsonPropertyName("note")]
+    [JsonPropertyName("notes")]
     public string? Note { get; set; }
 
     [JsonPropertyName("fields")]
-    public List<ItemField> Fields { get; set; }
+    public List<ItemField>? Fields { get; set; }
 }

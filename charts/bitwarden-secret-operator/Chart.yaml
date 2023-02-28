@@ -4,9 +4,9 @@ description: Deploy the Bitwarden Secret Operator
 
 type: application
 
-version: "0.8.2"
+version: "0.9.0"
 
-appVersion: "0.8.2"
+appVersion: "0.9.0"
 
 keywords:
   - operator

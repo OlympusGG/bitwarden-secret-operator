@@ -80,10 +80,10 @@ spec:
   content: # required, array of objects
   - bitwardenId: d4ff5941-53a4-4622-9385-2fcf910ae7e7 # optional, can be specified for a specific secret
     bitwardenSecretField: myBitwardenField # optional, mutually exclusive with `bitwardenSecretField` but acts as a second choice
-    bitwardenNote: false # optional, mutually exclusive and prioritized over `bitwardenSecretField`
+    bitwardenUseNote: false # optional, mutually exclusive and prioritized over `bitwardenSecretField`
     kubernetesSecretKey: MY_KUBERNETES_SECRET_KEY # required
     kubernetesSecretValue: value # optional, alternative to stringData
-  - bitwardenNote: true # boolean, exclusive and prioritized over `bitwardenSecretField`
+  - bitwardenUseNote: true # boolean, exclusive and prioritized over `bitwardenSecretField`
     kubernetesSecretKey: MY_KUBERNETES_SECRET_KEY # required
   stringData: # optional, string data
     test: hello-world

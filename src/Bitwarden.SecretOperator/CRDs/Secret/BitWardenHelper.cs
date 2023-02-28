@@ -50,7 +50,7 @@ public static class BitWardenHelper
             {
                 string value = GetField(element, item, fields, bitwardenId);
 
-                secrets[element.KubernetesSecretKey] = ToBase64ByteArray(value);
+                secrets[element.KubernetesSecretKey] = Encoding.UTF8.GetBytes(value);
             }
         }
 
@@ -83,12 +83,5 @@ public static class BitWardenHelper
             _ when element.BitwardenSecretField is not null && !fields.ContainsKey(element.BitwardenSecretField) => throw new DataException($"invalid field {element.BitwardenSecretField} for bitwardenId: {bitwardenId.ToString()}"),
             _ => throw new DataException($"invalid field for bitwardenId: {bitwardenId.ToString()}"),
         };
-    }
-
-    private static byte[] ToBase64ByteArray(this string input)
-    {
-        byte[] bytes = Encoding.UTF8.GetBytes(input);
-        string b64String = Convert.ToBase64String(bytes);
-        return Encoding.UTF8.GetBytes(b64String);
     }
 }

@@ -23,6 +23,8 @@ serviceAccount:
   # If not set and create is true, a name is generated using the fullname template
   name: ""
 
+httpPort: 5000
+
 #env:
 #  - name: BW_HOST
 #    value: "define_it"

@@ -2,6 +2,7 @@ using Bitwarden.SecretOperator;
 using Bitwarden.SecretOperator.CliWrapping;
 using KubeOps.KubernetesClient;
 using KubeOps.Operator;
+using KubeOps.Operator.Builder;
 using Serilog;
 using Serilog.Sinks.SystemConsole.Themes;
 
@@ -18,7 +19,8 @@ services.AddLogging(s =>
         .CreateLogger()
     );
 });
-var operatorBuilder = services.AddKubernetesOperator()
+
+IOperatorBuilder operatorBuilder = services.AddKubernetesOperator()
 #if DEBUG
     .AddWebhookLocaltunnel()
 #endif

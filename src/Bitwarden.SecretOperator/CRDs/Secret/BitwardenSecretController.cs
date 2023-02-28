@@ -38,14 +38,18 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
             var secret = await _kubernetesClient.Get<V1Secret>(destinationName, destinationNamespace);
             if (secret == null)
             {
+                _logger.LogInformation("Secret: {SecretName} in namespace: {Namespace} couldn't be found, creating it", destinationName, destinationNamespace);
                 // create
                 secret = await entity.GetSecretAsync(_cliWrapper);
                 secret = await _kubernetesClient.Create<V1Secret>(secret);
+                _logger.LogInformation("Secret: {SecretName} in namespace: {Namespace} created", destinationName, destinationNamespace);
             }
             else
             {
+                _logger.LogInformation("Secret: {SecretName} in namespace: {Namespace} exists, updating it", destinationName, destinationNamespace);
                 secret = await entity.GetSecretAsync(_cliWrapper);
                 await _kubernetesClient.Update<V1Secret>(secret);
+                _logger.LogInformation("Secret: {SecretName} in namespace: {Namespace} updated", destinationName, destinationNamespace);
             }
 
             // success

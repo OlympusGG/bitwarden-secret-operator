@@ -5,7 +5,7 @@ namespace Bitwarden.SecretOperator.CRDs;
 public class ElementSpec
 {
     [Description("Name of the Bitwarden `id` field")]
-    [Pattern("/^[0-9a-f]{8}-[0-9a-f]{4}-[0-5][0-9a-f]{3}-[089ab][0-9a-f]{3}-[0-9a-f]{12}$/i")]
+    [Pattern(@"^(\{{0,1}([0-9a-fA-F]){8}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){12}\}{0,1})$")]
     public string? BitwardenId { get; set; }
 
     [Description("Name of the Bitwarden `field` to use")]

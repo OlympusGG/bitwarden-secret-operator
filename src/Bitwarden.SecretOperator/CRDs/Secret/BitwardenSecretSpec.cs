@@ -14,6 +14,7 @@ public class BitwardenSecretSpec
     public string? Type { get; set; }
     
     [Description("Name of the Bitwarden Secret, optional and can be overriden by fields in `content.bitwardenId`")]
+    [Pattern(@"^(\{{0,1}([0-9a-fA-F]){8}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){4}-([0-9a-fA-F]){12}\}{0,1})$")]
     public string? BitwardenId { get; set; }
     
     [Description("A set of labels to put to the secret resource")]

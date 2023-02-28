@@ -69,10 +69,10 @@ spec:
   - element:
       bitwardenId: d4ff5941-53a4-4622-9385-2fcf910ae7e7 # optional, can be specified for a specific secret
       bitwardenSecretField: myBitwardenField # optional, mutually exclusive with `bitwardenSecretField` but acts as a second choice
-      bitwardenNote: false # optional, mutually exclusive and prioritized over `bitwardenSecretField`
+      bitwardenUseNote: false # optional, mutually exclusive and prioritized over `bitwardenSecretField`
       kubernetesSecretKey: MY_KUBERNETES_SECRET_KEY # required
   - element:
-      bitwardenNote: true # boolean, exclusive and prioritized over `bitwardenSecretField`
+      bitwardenUseNote: true # boolean, exclusive and prioritized over `bitwardenSecretField`
       kubernetesSecretKey: MY_KUBERNETES_SECRET_KEY # required
 ```
 

@@ -31,6 +31,7 @@ public class BitwardenCliWrapper : BackgroundService
 
         try
         {
+            _logger.LogInformation("using `bw login` command");
             CommandResult loginResult = await Cli.Wrap("bw")
                 .WithArguments(args => args
                     .Add("login")
@@ -60,6 +61,7 @@ public class BitwardenCliWrapper : BackgroundService
 
         try
         {
+            _logger.LogInformation("using `bw unlock` command");
             CommandResult result = await Cli.Wrap("bw")
                 .WithArguments(args => args
                     .Add("unlock")
@@ -92,13 +94,14 @@ public class BitwardenCliWrapper : BackgroundService
         }
     }
 
-    public async Task<BitwardenItem?> GetAsync(Guid itemId)
+    public async Task<BitwardenItem?> GetAsync(string itemId)
     {
         var stdOutBuffer = new StringBuilder();
         var stdErrBuffer = new StringBuilder();
 
         try
         {
+            _logger.LogInformation("using `bw get item` command");
             CommandResult result = await Cli.Wrap("bw")
                 .WithArguments(args => args
                     .Add("get")
@@ -131,6 +134,7 @@ public class BitwardenCliWrapper : BackgroundService
 
         try
         {
+            _logger.LogInformation("using `bw sync` command");
             CommandResult result = await Cli.Wrap("bw")
                 .WithArguments(args => args
                     .Add("sync")
@@ -170,6 +174,8 @@ public class BitwardenCliWrapper : BackgroundService
                     continue;
                 }
 
+                _logger.LogInformation("[{Scope}] Synchronizing...", nameof(BitwardenCliWrapper));
+                
                 await SynchronizeAsync();
                 // Synchronize may take some time
                 _lastSync = DateTime.UtcNow;

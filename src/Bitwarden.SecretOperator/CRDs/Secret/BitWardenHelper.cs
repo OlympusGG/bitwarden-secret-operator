@@ -34,12 +34,8 @@ public static class BitWardenHelper
         // fetch from bitwarden
         foreach (KeyValuePair<string, List<ElementSpec>> keyValuePair in toFetch)
         {
-            if (!Guid.TryParse(keyValuePair.Key, out Guid bitwardenId))
-            {
-                throw new InvalidDataException($"ID: {keyValuePair} is not a Guid (UUID)");
-            }
 
-            BitwardenItem? item = await wrapper.GetAsync(bitwardenId);
+            BitwardenItem? item = await wrapper.GetAsync(keyValuePair.Key);
             if (item == null)
             {
                 throw new InvalidDataException($"ID: {keyValuePair} couldn't be fetched for secret: {spec.Name}");
@@ -53,7 +49,7 @@ public static class BitWardenHelper
 
             foreach (ElementSpec element in keyValuePair.Value)
             {
-                string? value = GetSecretValue(element, item, fields, bitwardenId);
+                string? value = GetSecretValue(element, item, fields, keyValuePair.Key);
 
                 secrets[element.KubernetesSecretKey] = Encoding.UTF8.GetBytes(value);
             }
@@ -83,13 +79,13 @@ public static class BitWardenHelper
         };
     }
 
-    private static string GetSecretValue(ElementSpec element, BitwardenItem item, IReadOnlyDictionary<string, ItemField> fields, Guid bitwardenId)
+    private static string GetSecretValue(ElementSpec element, BitwardenItem item, IReadOnlyDictionary<string, ItemField> fields, string bitwardenId)
     {
         return element switch
         {
             _ when element.KubernetesSecretValue is not null => element.KubernetesSecretValue,
             _ when element.BitwardenUseNote is true && item.Note is not null => item.Note,
-            _ when element.BitwardenUseNote is true && item.Note is null => throw new DataException($"invalid note for bitwardenId: {bitwardenId.ToString()}"),
+            _ when element.BitwardenUseNote is true && item.Note is null => throw new DataException($"invalid note for bitwardenId: {bitwardenId}"),
             _ when element.BitwardenSecretField is not null && fields.ContainsKey(element.BitwardenSecretField) => fields[element.BitwardenSecretField].Value,
             _ when element.BitwardenSecretField is not null && !fields.ContainsKey(element.BitwardenSecretField) => throw new DataException(
                 $"invalid field {element.BitwardenSecretField} for bitwardenId: {bitwardenId.ToString()}"),

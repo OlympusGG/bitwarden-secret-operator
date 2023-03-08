@@ -38,6 +38,7 @@ services.AddSingleton<BitwardenCredentials>(new BitwardenCredentials
 });
 services.Configure<BitwardenOperatorOptions>(builder.Configuration.GetSection(nameof(BitwardenOperatorOptions)));
 services.AddSingleton<BitwardenCliWrapper>();
+services.AddHostedService<BitwardenCliWrapper>(s => s.GetRequiredService<BitwardenCliWrapper>());
 services.AddSingleton<KubernetesClient>();
 
 WebApplication app = builder.Build();

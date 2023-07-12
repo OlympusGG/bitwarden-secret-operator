@@ -104,10 +104,51 @@ public class BitwardenCliWrapper : BackgroundService
             _logger.LogInformation("using `bw get item` command");
             CommandResult result = await Cli.Wrap("bw")
                 .WithArguments(args => args
+                    .Add("--response")
                     .Add("get")
                     .Add("item")
                     .Add(itemId)
                     .Add("--nointeraction")
+                )
+                .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOutBuffer))
+                .WithEnvironmentVariables(new Dictionary<string, string?>
+                {
+                    { "BW_SESSION", _sessionId },
+                })
+                .ExecuteAsync();
+            string stdOut = stdOutBuffer.ToString();
+            
+            if (_logger.IsEnabled(LogLevel.Debug))
+            {
+                _logger.LogDebug("`bw get item`: {Debug}", stdOut);
+            }
+
+            var item = JsonSerializer.Deserialize<BitwardenCliResponse<BitwardenItem>>(stdOut);
+            if (item is { Success: false })
+            {
+                _logger.LogWarning("`bw get item`: {Error}", stdOut);
+            }
+
+            return item!.Data;
+        }
+        catch (Exception e)
+        {
+            string stdErr = stdErrBuffer.ToString();
+            _logger.LogError(e, "`bw get item`: {ItemId}: {Error}", itemId, stdErr);
+            return null;
+        }
+    }
+
+    public async Task SynchronizeAsync()
+    {
+        var stdErrBuffer = new StringBuilder();
+        var stdOutBuffer = new StringBuilder();
+        try
+        {
+            _logger.LogInformation("using `bw sync` command");
+            CommandResult result = await Cli.Wrap("bw")
+                .WithArguments(args => args
+                    .Add("sync")
                 )
                 .WithStandardOutputPipe(PipeTarget.ToStringBuilder(stdOutBuffer))
                 .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
@@ -116,41 +157,11 @@ public class BitwardenCliWrapper : BackgroundService
                     { "BW_SESSION", _sessionId },
                 })
                 .ExecuteAsync();
-            string stdOut = stdOutBuffer.ToString();
-            var item = JsonSerializer.Deserialize<BitwardenItem>(stdOut);
-            return item;
         }
         catch (Exception e)
         {
             string stdErr = stdErrBuffer.ToString();
-            _logger.LogError(e, "bw get item: {itemId}: {error}", itemId, stdErr);
-            return null;
-        }
-    }
-
-    public async Task SynchronizeAsync()
-    {
-        var stdErrBuffer = new StringBuilder();
-
-        try
-        {
-            _logger.LogInformation("using `bw sync` command");
-            CommandResult result = await Cli.Wrap("bw")
-                .WithArguments(args => args
-                    .Add("sync")
-                    .Add("--nointeraction")
-                )
-                .WithStandardErrorPipe(PipeTarget.ToStringBuilder(stdErrBuffer))
-                .WithEnvironmentVariables(new Dictionary<string, string?>
-                {
-                    { "BW_SESSION", _sessionId },
-                })
-                .ExecuteAsync();
-        }
-        catch (Exception e)
-        {
-            string stdErr = stdErrBuffer.ToString();
-            _logger.LogError(e, "bw sync: {error}", stdErr);
+            _logger.LogError(e, "bw sync: {Error}", stdErr);
         }
     }
 
@@ -177,6 +188,7 @@ public class BitwardenCliWrapper : BackgroundService
                 _logger.LogInformation("[{Scope}] Synchronizing...", nameof(BitwardenCliWrapper));
                 
                 await SynchronizeAsync();
+                _logger.LogInformation("[{Scope}] Synchronized", nameof(BitwardenCliWrapper));
                 // Synchronize may take some time
                 _lastSync = DateTime.UtcNow;
                 await Task.Delay(_operatorOptions.RefreshRate, stoppingToken);

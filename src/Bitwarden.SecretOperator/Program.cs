@@ -22,7 +22,7 @@ services.AddLogging(s =>
 
 IOperatorBuilder operatorBuilder = services.AddKubernetesOperator()
 #if DEBUG
-    .AddWebhookLocaltunnel()
+    // .AddWebhookLocaltunnel()
 #endif
     ;
 

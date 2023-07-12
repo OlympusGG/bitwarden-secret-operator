@@ -12,4 +12,5 @@ public class BitwardenItem
 
     [JsonPropertyName("fields")]
     public List<ItemField>? Fields { get; set; }
+    
 }

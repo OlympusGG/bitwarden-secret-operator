@@ -88,8 +88,8 @@ public static class BitWardenHelper
             _ when element.BitwardenUseNote is true && item.Note is null => throw new DataException($"invalid note for bitwardenId: {bitwardenId}"),
             _ when element.BitwardenSecretField is not null && fields.ContainsKey(element.BitwardenSecretField) => fields[element.BitwardenSecretField].Value,
             _ when element.BitwardenSecretField is not null && !fields.ContainsKey(element.BitwardenSecretField) => throw new DataException(
-                $"invalid field {element.BitwardenSecretField} for bitwardenId: {bitwardenId.ToString()}"),
-            _ => throw new DataException($"invalid field for bitwardenId: {bitwardenId.ToString()}"),
+                $"invalid field {element.BitwardenSecretField} for bitwardenId: {bitwardenId}"),
+            _ => throw new DataException($"invalid field for bitwardenId: {bitwardenId}"),
         };
     }
 }

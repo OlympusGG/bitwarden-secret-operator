@@ -3,6 +3,7 @@ using k8s.Models;
 using KubeOps.KubernetesClient;
 using KubeOps.Operator.Controller;
 using KubeOps.Operator.Controller.Results;
+using KubeOps.Operator.Entities.Extensions;
 using KubeOps.Operator.Events;
 using KubeOps.Operator.Rbac;
 using Microsoft.AspNetCore.Mvc;
@@ -46,6 +47,8 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
 
                 // create
                 secret = await entity.GetSecretAsync(_cliWrapper);
+                secret.WithOwnerReference(entity);
+                
                 secret = await _kubernetesClient.Create<V1Secret>(secret);
 
                 // created events
@@ -59,6 +62,8 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
 
                 // update
                 secret = await entity.GetSecretAsync(_cliWrapper);
+                
+                secret.WithOwnerReference(entity);
                 await _kubernetesClient.Update<V1Secret>(secret);
 
                 // updated events

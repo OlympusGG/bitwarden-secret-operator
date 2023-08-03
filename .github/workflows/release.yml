@@ -63,7 +63,7 @@ jobs:
       - name: Build and push Docker image
         if: ${{ steps.image_exists.outcome != 'success' }}
         id: build-and-push
-        uses: docker/build-push-action@v4.0.0
+        uses: docker/build-push-action@v4.1.1
         with:
           context: .
           push: ${{ github.event_name != 'pull_request' }}

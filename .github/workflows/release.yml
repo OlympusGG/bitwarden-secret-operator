@@ -80,7 +80,7 @@ jobs:
         if: ${{ steps.image_exists.outcome != 'success' && github.event_name != 'pull_request' }}
         env:
           COSIGN_EXPERIMENTAL: "true"
-        run: echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.app_version.outputs.result }}" | xargs -I {} cosign sign {}@${{ steps.build-and-push.outputs.digest }}
+        run: echo "${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.app_version.outputs.result }}" | xargs -I {} cosign sign -y {}@${{ steps.build-and-push.outputs.digest }}
 
   release:
     needs: build

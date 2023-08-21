@@ -34,11 +34,10 @@ public static class BitWardenHelper
         // fetch from bitwarden
         foreach (KeyValuePair<string, List<ElementSpec>> keyValuePair in toFetch)
         {
-
             BitwardenItem? item = await wrapper.GetAsync(keyValuePair.Key);
             if (item == null)
             {
-                throw new InvalidDataException($"ID: {keyValuePair} couldn't be fetched for secret: {spec.Name}");
+                throw new InvalidDataException($"Entity: {entity.Name()}, ID: {keyValuePair.Key} couldn't be fetched for secret: {spec.Name}");
             }
 
             Dictionary<string, ItemField> fields = item.Fields switch

@@ -12,8 +12,8 @@ public class BitwardenCliWrapper : BackgroundService
     private readonly ILogger<BitwardenCliWrapper> _logger;
 
     private string _sessionId;
-    private bool _isLoggedIn;
     private DateTime? _lastSync;
+    private bool _needRelog;
 
     public BitwardenCliWrapper(BitwardenCredentials credentials, ILogger<BitwardenCliWrapper> logger, IOptions<BitwardenOperatorOptions> operatorOptions)
     {
@@ -50,7 +50,7 @@ public class BitwardenCliWrapper : BackgroundService
         catch (Exception e)
         {
             string stdErr = stdErrBuffer.ToString();
-            _logger.LogError(e, "bw login: {error}", stdErr);
+            _logger.LogError(e, "bw login: {Error}", stdErr);
         }
     }
 
@@ -90,7 +90,7 @@ public class BitwardenCliWrapper : BackgroundService
         catch (Exception e)
         {
             string stdErr = stdErrBuffer.ToString();
-            _logger.LogError(e, "bw unlock: {error}", stdErr);
+            _logger.LogError(e, "bw unlock: {Error}", stdErr);
         }
     }
 
@@ -145,6 +145,11 @@ public class BitwardenCliWrapper : BackgroundService
         var stdOutBuffer = new StringBuilder();
         try
         {
+            if (_needRelog)
+            {
+                await LoginAsync();
+                return;
+            }
             _logger.LogInformation("using `bw sync` command");
             CommandResult result = await Cli.Wrap("bw")
                 .WithArguments(args => args
@@ -162,6 +167,10 @@ public class BitwardenCliWrapper : BackgroundService
         {
             string stdErr = stdErrBuffer.ToString();
             _logger.LogError(e, "bw sync: {Error}", stdErr);
+            if (stdErr.Contains("You are not logged in"))
+            {
+                _needRelog = true;
+            }
         }
     }
 

@@ -46,6 +46,7 @@ public class BitwardenCliWrapper : BackgroundService
                     { "BW_CLIENTSECRET", _credentials.ClientSecret }
                 })
                 .ExecuteAsync();
+            _needRelog = false;
         }
         catch (Exception e)
         {
@@ -117,7 +118,7 @@ public class BitwardenCliWrapper : BackgroundService
                 })
                 .ExecuteAsync();
             string stdOut = stdOutBuffer.ToString();
-            
+
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug("`bw get item`: {Debug}", stdOut);
@@ -150,6 +151,7 @@ public class BitwardenCliWrapper : BackgroundService
                 await LoginAsync();
                 return;
             }
+
             _logger.LogInformation("using `bw sync` command");
             CommandResult result = await Cli.Wrap("bw")
                 .WithArguments(args => args
@@ -195,7 +197,7 @@ public class BitwardenCliWrapper : BackgroundService
                 }
 
                 _logger.LogInformation("[{Scope}] Synchronizing...", nameof(BitwardenCliWrapper));
-                
+
                 await SynchronizeAsync();
                 _logger.LogInformation("[{Scope}] Synchronized", nameof(BitwardenCliWrapper));
                 // Synchronize may take some time

@@ -67,8 +67,8 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
                 V1Secret newSecret = await entity.GetSecretAsync(_cliWrapper);
 
                 // avoid updating if not needed
-                string? expectedHash = newSecret.GetLabel(BitWardenHelper.HashAnnotation);
-                string? hash = secret.GetLabel(BitWardenHelper.HashAnnotation);
+                string? expectedHash = newSecret.GetLabel(BitWardenHelper.HASH_LABEL_KEY);
+                string? hash = secret.GetLabel(BitWardenHelper.HASH_LABEL_KEY);
                 if (hash is not null && expectedHash is not null && hash == expectedHash)
                 {
                     return null;
@@ -78,7 +78,7 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
 
                 if (hash is null)
                 {
-                    secret.SetLabel(BitWardenHelper.HashAnnotation, expectedHash);
+                    secret.SetLabel(BitWardenHelper.HASH_LABEL_KEY, expectedHash);
                 }
 
 

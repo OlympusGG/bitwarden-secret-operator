@@ -37,6 +37,11 @@ public class DictionaryHashComputation
             {"test1", "test2"u8.ToArray()},
             {"test2", "test3"u8.ToArray()}
         };
+        var dico3 = new Dictionary<string, byte[]>()
+        {
+            {"test1", "test2"u8.ToArray()},
+            {"test2", "test3"u8.ToArray()}
+        };
         var dico2 = new Dictionary<string, byte[]>()
         {
             {"test1", "test3"u8.ToArray()},
@@ -44,7 +49,7 @@ public class DictionaryHashComputation
         };
 
         string hash1 = dico1.ComputeHash();
-        string hash1Bis = dico1.ComputeHash();
+        string hash1Bis = dico3.ComputeHash();
         Check.That(hash1).IsEqualTo(hash1Bis);
         
         string hash2 = dico2.ComputeHash();

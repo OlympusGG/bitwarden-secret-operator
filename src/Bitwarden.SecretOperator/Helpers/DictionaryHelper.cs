@@ -16,9 +16,13 @@ public static class DictionaryHelper
         string concatenatedString = string.Join("|", combinedPairs);
 
         byte[] inputBytes = Encoding.UTF8.GetBytes(concatenatedString);
-        byte[] hashedBytes = SHA256.HashData(inputBytes);
+        
+        // sha256
+        // byte[] hash = SHA256.HashData(inputBytes);
+        // return Convert.ToBase64String(hash).ToLower();
 
-        return BitConverter.ToString(hashedBytes).Replace("-", "").ToLower();
+        byte[] hash = SHA1.HashData(inputBytes);
+        return BitConverter.ToString(hash).Replace("-", "").ToLower();
     }
     
     public  static string ComputeHash(this Dictionary<string, byte[]> dict)
@@ -34,7 +38,13 @@ public static class DictionaryHelper
             stream.WriteByte((byte)'|');
             stream.Write(pair.Value, 0, pair.Value.Length);
         }
-
-        return BitConverter.ToString(SHA256.HashData(stream.ToArray())).Replace("-", "").ToLower();
+        
+        // sha256
+        // byte[] hash = SHA256.HashData(stream.ToArray());
+        // return Convert.ToBase64String(hash);
+        
+        
+        byte[] hash = SHA1.HashData(stream.ToArray());
+        return BitConverter.ToString(hash).Replace("-", "").ToLower();
     }
 }

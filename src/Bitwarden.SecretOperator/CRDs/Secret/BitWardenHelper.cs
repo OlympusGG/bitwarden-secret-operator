@@ -1,12 +1,14 @@
 ﻿using System.Data;
 using System.Text;
 using Bitwarden.SecretOperator.CliWrapping;
+using Bitwarden.SecretOperator.Helpers;
 using k8s.Models;
 
 namespace Bitwarden.SecretOperator.CRDs.Secret;
 
 public static class BitWardenHelper
 {
+    public const string HashAnnotation = "bitwarden-operator/hash";
     public static async Task<V1Secret> GetSecretAsync(this BitwardenSecretCrd entity, BitwardenCliWrapper wrapper)
     {
         BitwardenSecretSpec spec = entity.Spec;
@@ -60,6 +62,9 @@ public static class BitWardenHelper
             secrets[rawValues.KubernetesSecretKey] = Encoding.UTF8.GetBytes(rawValues.KubernetesSecretValue!);
         }
 
+        spec.Labels ??= new Dictionary<string, string>();
+        spec.Labels[HashAnnotation] = secrets.ComputeHash();
+
         string? destinationName = spec.Name ?? entity.Name();
         string? destinationNamespace = spec.Namespace ?? entity.Namespace();
         return new V1Secret
@@ -71,7 +76,7 @@ public static class BitWardenHelper
             {
                 Name = destinationName,
                 NamespaceProperty = destinationNamespace,
-                Labels = spec.Labels
+                Labels = spec.Labels,
             },
             Data = secrets,
             StringData = spec.StringData

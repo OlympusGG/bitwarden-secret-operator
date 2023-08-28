@@ -1,4 +1,6 @@
-﻿using Bitwarden.SecretOperator.CliWrapping;
+﻿using System.Security.Cryptography;
+using System.Text;
+using Bitwarden.SecretOperator.CliWrapping;
 using k8s.Models;
 using KubeOps.KubernetesClient;
 using KubeOps.Operator.Controller;
@@ -39,7 +41,6 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
         string? destinationNamespace = spec.Namespace ?? entity.Namespace();
         try
         {
-            await _eventManager.PublishAsync(entity, "bitwarden-secret-operator", "Received reconcile");
             var secret = await _kubernetesClient.Get<V1Secret>(destinationName, destinationNamespace);
             if (secret == null)
             {
@@ -48,7 +49,7 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
                 // create
                 secret = await entity.GetSecretAsync(_cliWrapper);
                 secret.WithOwnerReference(entity);
-                
+
                 secret = await _kubernetesClient.Create<V1Secret>(secret);
 
                 // created events
@@ -61,9 +62,25 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
                 _logger.LogInformation("Secret: {SecretName} in namespace: {Namespace} exists, updating it", destinationName, destinationNamespace);
 
                 // update
-                secret = await entity.GetSecretAsync(_cliWrapper);
+                V1Secret newSecret = await entity.GetSecretAsync(_cliWrapper);
+
+                // avoid updating if not needed
+                string? expectedHash = newSecret.GetLabel(BitWardenHelper.HashAnnotation);
+                string? hash = secret.GetLabel(BitWardenHelper.HashAnnotation);
+                if (hash is not null && expectedHash is not null && hash == expectedHash)
+                {
+                    return null;
+                }
                 
-                secret.WithOwnerReference(entity);
+                if (secret.FindOwnerReference(s => s.Name == entity.Name() && s.Uid == entity.Uid()) < 1)
+                {
+                    secret.AddOwnerReference(entity.MakeOwnerReference());
+                }
+                
+                // update data
+                secret.Data = newSecret.Data;
+                secret.StringData = newSecret.StringData;
+
                 await _kubernetesClient.Update<V1Secret>(secret);
 
                 // updated events
@@ -88,6 +105,7 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
             return ResourceControllerResult.RequeueEvent(_operatorOptions.DelayAfterFailedWebhook.Value);
         }
     }
+    
 
     public Task StatusModifiedAsync(BitwardenSecretCrd entity)
     {

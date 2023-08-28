@@ -1,6 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using Bitwarden.SecretOperator.CliWrapping;
+using k8s.Autorest;
 using k8s.Models;
 using KubeOps.KubernetesClient;
 using KubeOps.Operator.Controller;
@@ -50,6 +51,7 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
                 secret = await entity.GetSecretAsync(_cliWrapper);
                 secret.WithOwnerReference(entity);
 
+
                 secret = await _kubernetesClient.Create<V1Secret>(secret);
 
                 // created events
@@ -65,18 +67,21 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
                 V1Secret newSecret = await entity.GetSecretAsync(_cliWrapper);
 
                 // avoid updating if not needed
-                string? expectedHash = newSecret.GetLabel(BitWardenHelper.HashAnnotation);
-                string? hash = secret.GetLabel(BitWardenHelper.HashAnnotation);
+                string? expectedHash = newSecret.GetLabel(BitWardenHelper.HASH_LABEL_KEY);
+                string? hash = secret.GetLabel(BitWardenHelper.HASH_LABEL_KEY);
                 if (hash is not null && expectedHash is not null && hash == expectedHash)
                 {
                     return null;
                 }
-                
-                if (secret.FindOwnerReference(s => s.Name == entity.Name() && s.Uid == entity.Uid()) < 1)
+
+                secret.WithOwnerReference(entity);
+
+                if (hash is null)
                 {
-                    secret.AddOwnerReference(entity.MakeOwnerReference());
+                    secret.SetLabel(BitWardenHelper.HASH_LABEL_KEY, expectedHash);
                 }
-                
+
+
                 // update data
                 secret.Data = newSecret.Data;
                 secret.StringData = newSecret.StringData;
@@ -91,6 +96,18 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
 
             // success
             return null;
+        }
+        catch (HttpOperationException e)
+        {
+            await _eventManager.PublishAsync(entity, "Failed", $"Secret {destinationName} in namespace {destinationNamespace}, failed to create, check operator logs", EventType.Warning);
+            _logger.LogError(e, "[{Method}] Failed, response: {ResponseContent}", nameof(ReconcileAsync), e.Response.Content);
+            // requeue the event in 15 seconds
+            if (_operatorOptions.DelayAfterFailedWebhook is null)
+            {
+                throw;
+            }
+
+            return ResourceControllerResult.RequeueEvent(_operatorOptions.DelayAfterFailedWebhook.Value);
         }
         catch (Exception e)
         {

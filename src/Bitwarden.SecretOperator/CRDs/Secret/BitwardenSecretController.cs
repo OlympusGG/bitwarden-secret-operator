@@ -51,7 +51,6 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
                 secret = await entity.GetSecretAsync(_cliWrapper);
                 secret.WithOwnerReference(entity);
 
-
                 secret = await _kubernetesClient.Create<V1Secret>(secret);
 
                 // created events
@@ -72,7 +71,6 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
                 {
                     return null;
                 }
-                await _eventManager.PublishAsync(secret, "Updating", $"Secret {destinationName} in namespace {destinationNamespace}, updating it...");
 
                 secret.WithOwnerReference(entity);
 
@@ -95,6 +93,7 @@ public class BitwardenSecretController : ControllerBase, IResourceController<Bit
             }
 
             // success
+            await _kubernetesClient.UpdateStatus(entity);
             return null;
         }
         catch (HttpOperationException e)

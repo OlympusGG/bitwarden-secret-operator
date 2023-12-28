@@ -2,6 +2,30 @@ apiVersion: v1
 entries:
   bitwarden-secret-operator:
   - apiVersion: v2
+    appVersion: 0.15.0
+    created: "2023-12-28T22:42:45.210190373Z"
+    description: Deploy the Bitwarden Secret Operator
+    digest: 46401dfa9c7b2a0df269c4628a57489faef601f9ffe877e1126056bbf2d18b1f
+    home: https://olympusgg.github.io/bitwarden-secret-operator/
+    icon: https://olympusgg.github.io/bitwarden-secret-operator/logo.png
+    keywords:
+    - operator
+    - bitwarden
+    - vaultwarden
+    - secret-management
+    - gitops
+    kubeVersion: '>= 1.23.0-0'
+    maintainers:
+    - email: contact@olympusgg.com
+      name: OlympusGG
+    name: bitwarden-secret-operator
+    sources:
+    - https://github.com/OlympusGG/bitwarden-secret-operator
+    type: application
+    urls:
+    - https://github.com/OlympusGG/bitwarden-secret-operator/releases/download/bitwarden-secret-operator-0.15.0/bitwarden-secret-operator-0.15.0.tgz
+    version: 0.15.0
+  - apiVersion: v2
     appVersion: 0.14.2
     created: "2023-09-21T13:37:04.021993798Z"
     description: Deploy the Bitwarden Secret Operator
@@ -551,4 +575,4 @@ entries:
     urls:
     - https://github.com/OlympusGG/bitwarden-secret-operator/releases/download/bitwarden-secret-operator-0.5.3/bitwarden-secret-operator-0.5.3.tgz
     version: 0.5.3
-generated: "2023-09-21T13:37:04.022631355Z"
+generated: "2023-12-28T22:42:45.210347918Z"

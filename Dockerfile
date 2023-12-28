@@ -7,14 +7,14 @@ RUN apk add wget unzip
 RUN cd /tmp && wget https://github.com/bitwarden/clients/releases/download/cli-v${BW_VERSION}/bw-linux-${BW_VERSION}.zip && \
     unzip /tmp/bw-linux-${BW_VERSION}.zip
 
-FROM mcr.microsoft.com/dotnet/sdk:7.0-jammy as build
+FROM mcr.microsoft.com/dotnet/sdk:8.0-jammy as build
 WORKDIR /operator
 
 COPY ./ ./
 RUN dotnet publish -c Release -o out src/Bitwarden.SecretOperator/Bitwarden.SecretOperator.csproj
 
 # The runner for the application
-FROM mcr.microsoft.com/dotnet/aspnet:7.0-jammy as final
+FROM mcr.microsoft.com/dotnet/aspnet:8.0-jammy as final
 
 RUN addgroup k8s-operator && useradd --create-home -G k8s-operator operator-user
 

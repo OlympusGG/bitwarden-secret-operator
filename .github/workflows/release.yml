@@ -74,7 +74,7 @@ jobs:
 
       - name: Install cosign
         if: ${{ steps.image_exists.outcome != 'success' && github.event_name != 'pull_request' }}
-        uses: sigstore/cosign-installer@v3.1.2
+        uses: sigstore/cosign-installer@v3.4.0
 
       - name: Sign the published Docker image
         if: ${{ steps.image_exists.outcome != 'success' && github.event_name != 'pull_request' }}

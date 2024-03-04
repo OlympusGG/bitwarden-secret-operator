@@ -102,7 +102,7 @@ jobs:
         run: echo IMAGE_NAME=$(echo ${{ env.IMAGE_NAME }} | tr '[:upper:]' '[:lower:]') >> $GITHUB_ENV
 
       - name: Install Helm
-        uses: azure/setup-helm@v3
+        uses: azure/setup-helm@v4
         with:
           version: v3.10.0
 

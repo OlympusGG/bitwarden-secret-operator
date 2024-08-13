@@ -1,6 +1,6 @@
 ﻿FROM alpine:latest as downloader
 
-ARG BW_VERSION=2024.7.2
+ARG BW_VERSION=2023.5.0
 
 RUN apk add wget unzip
 

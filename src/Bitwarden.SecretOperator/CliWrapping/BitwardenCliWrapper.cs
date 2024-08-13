@@ -118,19 +118,16 @@ public class BitwardenCliWrapper : BackgroundService
                 })
                 .ExecuteAsync();
             string stdOut = stdOutBuffer.ToString();
-            string stdErr = stdErrBuffer.ToString();
 
             if (_logger.IsEnabled(LogLevel.Debug))
             {
                 _logger.LogDebug("`bw get item`: {Debug}", stdOut);
-                _logger.LogDebug("`bw get item`: {Error}", stdErr);
             }
 
             var item = JsonSerializer.Deserialize<BitwardenCliResponse<BitwardenItem>>(stdOut);
             if (item is { Success: false })
             {
                 _logger.LogWarning("`bw get item`: {Error}", stdOut);
-                _logger.LogWarning("`bw get item`: {Error}", stdErr);
             }
 
             return item!.Data;
